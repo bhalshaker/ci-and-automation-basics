@@ -1,4 +1,6 @@
-name: Python CI
+# .github/workflows/robust_ci.yml
+
+name: Robust Python CI
 
 on: [push, pull_request]
 
@@ -8,11 +10,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: $-pip-$
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run tests
+
+      - name: Set environment variables
+        run: echo "ENV=ci" >> $GITHUB_ENV
+
+      - name: Run tests with secret
+        env:
+          MY_SECRET_KEY: $
         run: pytest
